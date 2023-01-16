@@ -2,27 +2,29 @@ const { ChatInputCommandInteraction, InteractionType, EmbedBuilder } = require("
 const jsonconfig = require("../../config.json");
 module.exports = {
     name: "messageDelete",
-   /**
-    * 
-    * @param {Client} client 
-    */
-    execute(message, client) {
+    /**
+     * 
+     * @param {Client} client 
+     */
+    async execute(message, client) {
         let msgEmbed = new EmbedBuilder()
-            .setAuthor({ name: message.user.username + " | " + jsonconfig.server.name, iconURL: jsonconfig.server.iconURL})
+            .setAuthor({ name: message.member.user.username + " | " + jsonconfig.server.name, iconURL: jsonconfig.server.iconURL })
             .setColor("DarkBlue")
-            .setTitle("Member left")
+            .setTitle("Message deleted")
             .setFields(
-                {name:`Author`, value: `${message.member.name}`},
-                {name: "Message", value:message},
-                {name: "Message content", value:message.content},
-                {name: "Channel", value:message.channel},
+                { name: `Author`, value: `${message.member.user.username}` },
+                {
+                    name: "Message content", value: message.content
+                    //  || "No content, somehow.." 
+                },
+                { name: "Channel", value: `${message.channel}` },
 
             )
-            .setFooter({text:`Message deleted at`, iconURL: message.member.avatarURL()})
-            .setFooter();
-            ;
-        const msgLogCH = client.channels.fetch(jsonconfig.server.channels.messageLogChannel);
-        msgLogCH.send({ embeds: [leftEmbed] }).catch(console.error)
+            .setFooter({ text: `Message deleted at`, iconURL: message.member.avatarURL() })
+            .setTimestamp();
+        ;
+        const msgLogCH = client.channels.cache.get(jsonconfig.server.channels.messageLogChannel);
+        await msgLogCH.send({ embeds: [msgEmbed] }).catch(console.error)
 
     }
 }
