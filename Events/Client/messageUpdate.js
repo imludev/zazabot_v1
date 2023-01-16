@@ -10,25 +10,39 @@ module.exports = {
      * @param {Client} client 
      */
     execute(oldMessage, newMessage, client) {
-        if (oldMessage == newMessage) { return; } else {
+        const msgLogCH = client.channels.cache.get(jsonconfig.server.channels.messageLogChannel);
+
+        if (oldMessage.content == newMessage.content) { return; } else if (oldMessage.content != newMessage.content) {
             let msgEmbed = new EmbedBuilder()
-                .setAuthor({ name: message.user.username + " | " + jsonconfig.server.name, iconURL: jsonconfig.server.iconURL })
+                .setAuthor({ name: oldMessage.member.user.username + " | " + jsonconfig.server.name, iconURL: jsonconfig.server.iconURL })
                 .setColor("DarkBlue")
-                .setTitle("Member left")
+                .setTitle("Message editted")
                 .setFields(
-                    { name: `Author`, value: `${oldMessage.member.name}` },
-                    { name: "Old message", value: oldMessage },
+                    { name: `Author`, value: `${oldMessage.member.user.username}` },
                     { name: "Old message content", value: oldMessage.content },
-                    { name: "New message", value: newMessage },
                     { name: "New message content", value: newMessage.content },
-                    { name: "Channel", value: oldMessage.channel },
+                    { name: "Channel", value: `${oldMessage.channel}` },
 
                 )
                 .setFooter({ text: `Message deleted at`, iconURL: oldMessage.member.avatarURL() })
-                .setFooter();
+                .setTimestamp();
 
-            const msgLogCH = client.channels.fetch(jsonconfig.server.channels.messageLogChannel);
-            msgLogCH.send({ embeds: [leftEmbed] }).catch(console.error);
+            msgLogCH.send({ embeds: [msgEmbed] }).catch(console.error);
+        } else {
+            let msgUpdEmbed = new EmbedBuilder()
+                .setAuthor({ name: oldMessage.member.user.username + " | " + jsonconfig.server.name, iconURL: jsonconfig.server.iconURL })
+                .setColor("DarkBlue")
+                .setTitle("Message updated")
+                .setFields(
+                    { name: `Author`, value: `${oldMessage.member.user.username}` },
+                    { name: "Message content", value: oldMessage.content },
+                    { name: "Channel", value: `${oldMessage.channel}` },
+
+                )
+                .setFooter({ text: `Message updated at`, iconURL: oldMessage.member.avatarURL() })
+                .setTimestamp();
+
+            msgUpdEmbed.send({ embeds: [msgEmbed] }).catch(console.error);
         }
     }
 }

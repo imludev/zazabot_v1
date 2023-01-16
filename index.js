@@ -2,10 +2,10 @@
 
 // Defining the Client
 const { Client, GatewayIntentBits, Partials, Collection } = require("discord.js");
-const { Guilds, GuildMembers, GuildMessages } = GatewayIntentBits;
+const { Guilds, GuildMembers, GuildMessages, MessageContent } = GatewayIntentBits;
 const { User, Message, GuildMember, ThreadMember } = Partials;
 const client = new Client({
-    intents: [Guilds, GuildMembers, GuildMessages],
+    intents: [Guilds, GuildMembers, GuildMessages, MessageContent],
     Partials: [User, Message, GuildMember, ThreadMember]
 });
 const { loadEvents } = require("./Handlers/eventHandler")
@@ -14,6 +14,7 @@ client.config = require("./config.json");
 client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
+client.color = "#206694";
 
 
 // Events

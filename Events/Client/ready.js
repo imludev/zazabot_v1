@@ -62,10 +62,11 @@ module.exports = {
         updateStatus();
 
         loadCommands(client);
-        
+
         const RSSParser = require("rss-parser");
         const ytChannel = await client.channels.fetch(jsonconfig.server.channels.ytUploadChannel);
         const request = new RSSParser();
+        const urlRegexp = /(https?:\/\/[^ ]*)/;
 
         setInterval(async () => {
             const req = (await request.parseURL(`https://www.youtube.com/feeds/videos.xml?channel_id=${process.env.YT_ID}`)).items[0];
@@ -74,7 +75,7 @@ module.exports = {
             if (ifAlready.length > 0) ifAlready = ifAlready[0].content.match(urlRegexp);
             if (ifAlready != null) ifAlready = ifAlready[1];
             if (ifAlready == req?.link) return;
-
+            console.log(`Sent a new YT notification to channel ${jsonconfig.server.channels.ytUploadChannel}. ${req.link}`);
             ytChannel.send(`${jsonconfig.messages.newYTPost.replace(`{url}`, req.link)}`);
         }, 5 * 1000)
 
