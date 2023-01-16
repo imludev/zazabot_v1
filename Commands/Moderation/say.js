@@ -9,6 +9,12 @@ module.exports = {
             .setDescription("Enter some text")
             .setRequired(true)
             .setMaxLength(200)
+        )
+        .addChannelOption(options => options
+            .setName("channel")
+            .setDescription("Enter a channel")
+            .setRequired(true)
+
         ),
 
     /**
@@ -17,7 +23,8 @@ module.exports = {
      * @param {Client} client 
      */
     execute(interaction, client) {
-        const inputTXT = interaction.options.getString("text")
-
+        const inputTXT = interaction.options.getString("text");
+        const channel = interaction.options.getChannel("channel");
+        channel.send(inputTXT)
     }
 }
