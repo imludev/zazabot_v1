@@ -1,10 +1,10 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } = require("discord.js");;
-const config = require("./config.json");
+const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Client } = require("discord.js");;
+const jsonconfig = require("./config.json");
 const variables = require("./variables.js")
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("ping")
-        .setDescription("Check the bots latency")
+        .setName("name")
+        .setDescription("")
         .addStringOption(options => options
             .setName("text")
             .setDescription("Enter some text")
@@ -12,12 +12,16 @@ module.exports = {
             .setMaxLength(200)
         ),
     /**
+     * 
      * @param {ChatInputCommandInteraction} interaction 
+     * @param {Client} client 
      */
     execute(interaction, client) {
+
+        const text = interaction.options.getString("text");
         var embed = new EmbedBuilder()
-            .setAuthor({ name: `${interaction.user.username}, ${config.server.name}`, iconURL: interaction.user.avatarURL() })
-            .setColor("")
+            .setAuthor({ name: `${interaction.user.username} | ${jsonconfig.server.name}`, iconURL: interaction.user.avatarURL() })
+            .setColor("DarkBlue")
             .setTitle("")
             .setDescription(``)
             .setFields(
@@ -33,9 +37,10 @@ module.exports = {
             })
             .setTimestamp();
         interaction.reply({
-            content: `${config.messages.lazydog}`,
+            content: `${jsonconfig.messages.lazydog}`,
             embeds: [embed],
             ephemeral: false
         });
+
     }
 }
