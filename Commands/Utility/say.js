@@ -14,7 +14,6 @@ module.exports = {
             .setName("channel")
             .setDescription("Enter a channel")
             .setRequired(true)
-
         ),
 
     /**
