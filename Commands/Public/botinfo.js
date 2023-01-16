@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } = require("discord.js");
 const pckg = require("../../package.json");
-const confg = require("../../config.json")
+const jsonconfig = require("../../config.json")
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("botinfo")
@@ -16,7 +16,7 @@ module.exports = {
 
 
         let botinfoEmbed = new EmbedBuilder()
-            .setColor("#72008E")
+            .setColor("DarkBlue")
             .setTitle("Bot info")
             // .setDescription(``)
             .addFields(
@@ -39,7 +39,7 @@ module.exports = {
                 },
                 {
                     name: `Made by`,
-                    value: `[${confg.owner.name}](https://discord.com/users/${confg.owner.id})`,
+                    value: `[${jsonconfig.botowner.name}](https://discord.com/users/${jsonconfig.botowner.id})`,
                     inline: false
                 },
                 // {
@@ -57,7 +57,7 @@ module.exports = {
             )
 
         interaction.reply({
-            content: `Not available yet.`, embeds: [botinfoEmbed]
+            embeds: [botinfoEmbed]
         });
     }
 }
