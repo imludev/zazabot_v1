@@ -18,14 +18,16 @@ module.exports = {
         const guild = interaction.guild;
         const reason = interaction.options.getString("reason");
         const TicketNR = interaction.user.username.toLowerCase() || interaction.user.username.replace(" ", "") || interaction.user.id.slice(0, 7) || interaction.user.id;
-
+        function getTimestamp() {
+            return Date.now()
+        };
 
         interaction.guild.channels.create({
             name: `ticket-${TicketNR}`,
             type: ChannelType.GuildText,
             parent: jsonconfig.server.channels.ticketCategory,
-            topic: `Ticket created by ${interaction.user.username}#${interaction.user.discriminator}, for: "${reason}"\nTicket nr.:${TicketNR}`,
-            reason: `Created a ticket for ${interaction.user.username}. \nReason: ${reason}.\nTicket nr.:${TicketNR}\n`,
+            topic: `Ticket was created by **${interaction.user.username}#${interaction.user.discriminator}**, ${interaction.user.id}. \nReason: *${reason}*.\nTicket identifier.: ${TicketNR}\nCreated at: ${getTimestamp()} `,
+            reason: `Created a ticket for **${interaction.user.username}#${interaction.user.discriminator}**, ${interaction.user.id}. \nReason: ${reason}.\nTicket identifier.: ${TicketNR}\nCreated at: ${getTimestamp()} `,
             permissionOverwrites: [
                 {
                     id: interaction.guild.id,
