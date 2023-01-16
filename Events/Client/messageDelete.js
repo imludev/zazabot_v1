@@ -15,7 +15,7 @@ module.exports = {
                 { name: `Author`, value: `${message.member.user.username}` },
                 {
                     name: "Message content", value: message.content
-                    //  || "No content, somehow.." 
+                        || "No content, somehow.. This might be an embedded message without text."
                 },
                 { name: "Channel", value: `${message.channel}` },
 
