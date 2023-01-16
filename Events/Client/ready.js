@@ -62,20 +62,21 @@ module.exports = {
         updateStatus();
 
         loadCommands(client);
+        
+        const RSSParser = require("rss-parser");
+        const ytChannel = await client.channels.fetch(jsonconfig.server.channels.ytUploadChannel);
+        const request = new RSSParser();
 
-        // const ytChannel = await client.channels.fetch("1063114350870659172");
-        // const request = new RSSParser();
+        setInterval(async () => {
+            const req = (await request.parseURL(`https://www.youtube.com/feeds/videos.xml?channel_id=${process.env.YT_ID}`)).items[0];
 
-        // setInterval(async () => {
-        //     const req = (await request.parseURL(`https://www.youtube.com/feeds/videos.xml?channel_id=${process.env.YT_ID}`)).items[0];
+            let ifAlready = [...(await ytChannel.messages.fetch({ limit: 1 })).values()]
+            if (ifAlready.length > 0) ifAlready = ifAlready[0].content.match(urlRegexp);
+            if (ifAlready != null) ifAlready = ifAlready[1];
+            if (ifAlready == req?.link) return;
 
-        //     let ifAlready = [...(await ytChannel.messages.fetch({ limit: 1 })).values()]
-        //     if (ifAlready.length > 0) ifAlready = ifAlready[0].content.match(urlRegexp);
-        //     if (ifAlready != null) ifAlready = ifAlready[1];
-        //     if (ifAlready == req?.link) return;
-
-        //     ytChannel.send(`${jsonconfig.messages.newYTPost.replace(`{url}`, req.link)}`);
-        // }, 15000)
+            ytChannel.send(`${jsonconfig.messages.newYTPost.replace(`{url}`, req.link)}`);
+        }, 5 * 1000)
 
 
         // https://www.youtube.com/watch?v=eET370wIJSM&list=PLv0io0WjFNn9LDsv1W4fOWygNFzY342Jm&index=13
