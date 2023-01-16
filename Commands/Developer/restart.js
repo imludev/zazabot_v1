@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { loadCommands } = require("../../Handlers/commandHandler");
 const { loadEvents } = require("../../Handlers/eventHandler")
-const config = require("../../config.json")
+const jsonconfig = require("../../config.json")
 
 module.exports = {
     developer: true,
@@ -22,12 +22,12 @@ module.exports = {
      */
     execute(interaction, client) {
         const subCommand = interaction.options.getSubcommand();
-        const ownerId = config.botowner.id.toString();
-        const servOwnerId = config.server.owner.id.toString();
-        if (interaction.user.id != ownerId || interaction.user.id != servOwnerId) {
-            interaction.reply("You are not the owner >:(")
+        const ownerId = jsonconfig.botowner.id;
+        const servOwnerId = jsonconfig.server.owner.id;
+        if (interaction.user.id != ownerId) {
+            interaction.reply("You are not the owner")
         }
-        else if (interaction.user.id == ownerId  || interaction.user.id == servOwnerId) {
+        else if (interaction.user.id == ownerId || interaction.user.id == servOwnerId) {
             switch (subCommand) {
                 case "events": {
                     for (const [key, value] of client.events)
