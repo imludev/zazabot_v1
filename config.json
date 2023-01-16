@@ -1,0 +1,89 @@
+{
+    "botowner": {
+        "name": "Odinsson25",
+        "id": "938925825355571251"
+    },
+    "bot":{
+        "name":"ZazaBot",
+        "iconURL":"https://cdn.discordapp.com/attachments/1064204376400470088/1064209183806849186/zaza_profile.jpg"
+    },
+    "server": {
+        "name": "Zazagames",
+        "id": "1064204375716802580",
+        "description":"",
+        "iconURL":"https://cdn.discordapp.com/attachments/1064204376400470088/1064209183806849186/zaza_profile.jpg",
+        "bannerURL":"",
+        "owner": {
+            "name": "",
+            "id": "938925825355571251"
+        },
+        "roles": {
+            "member": "1064204375716802581",
+            "support": "1064204375716802585",
+            "manager": "1064204375716802586",
+            "owner": "1064204375716802587",
+            "botowner": "1064214959220871189"
+        },
+        "channels": {
+            "ticketCategory": "1064215339694571521",
+            "ticketLogChannel": "1064216511344037908",
+            "ticketsEnabled": true,
+            "modLogChannel": "1064216456423809034",
+            "suggestChannel": "1032194532340670514",
+            "suggestCheckChannel": "1064216569749704754",
+            "messageLogChannel": "1064216664171888690",
+            "ytUploadChannel":"1064204376228511926",
+            "welcomeChannel":"1064204376228511928",
+            "leaveChannel":"1064204376228511928",
+            "rulesChannel":"1064216664171888690"
+        }
+    },
+    "messages": {
+        "lorem": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui.",
+        "lazydog": "The `quick` brown *fox*, jumps **over** the lazy __dog__?!...",
+        "newYTPost":"Zazagames heeft een nieuwe video geupload! \n{url}",
+        "errors": {
+            "preformAction": "You cannot preform this action.",
+            "undefinedErr": "There was an undefined error. Please try again later.",
+            "moderation": {
+                "noPerms": "You have insufficient permissions to execute this command.",
+                "kickErr": "There was an error while kicking the person.",
+                "banErr": "There was an error while banning the person.",
+                "muteErr": "There was an error while timing out the person."
+            },
+            "tickets": {
+                "noTicketChan":"This is not a (valid) ticket channel.",
+                "noClosedTicket":"This is not a closed ticket.",
+                "noOpenTicket":"This is not an open ticket.",
+                "claimErr": "There was an error while claiming this ticket.",
+                "alrClaimed":"This ticket is already claimed.",
+                "closeErr": "There was an error while closing this ticket.",
+                "closedTicket":"This is a closed ticket. Please re-open this ticket to execute this command.",
+                "addErr": "There was an error while adding someone to this ticket.",
+                "removeErr": "There was an error while removing someone to this ticket.",
+                "openErr": "There was an error while creating a ticket. Please try again later."
+            },
+            "config": {
+                "addConfErr": "There was an error while adding this configuration. Please try again later.",
+                "editConfErr": "There was an error while editing this configuration. Please try again later.",
+                "remConfErr": "There was an error while removing this configuration. Please try again later.",
+                "notCorrSetup":"The bot was not correctly setted up. Please review your settings."
+            },
+            "su": {
+                "allGuildsErr": "There was an error while showing all the guilds. Please try again later.",
+                "leaveGuildErr": "There was an error while leaving the guild. Please try again later.",
+                "restartEventErr": "There was an error while restarting the events. Please try again later.",
+                "restartCommandsErr": "There was an error while restarting the commands. Please try again later."
+            },
+            "rest":{
+                "invalidInput":"One or multiple inputs were invalid."
+            }
+        },
+        "success":{
+            "ticket":{},
+            "config":{
+                "addedConf":"The configuration was added successfully."
+            }
+        }
+    }
+}
