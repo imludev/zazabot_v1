@@ -4,7 +4,13 @@ const variables = require("./variables.js")
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ping")
-        .setDescription("Check the bots latency"),
+        .setDescription("Check the bots latency")
+        .addStringOption(options => options
+            .setName("text")
+            .setDescription("Enter some text")
+            .setRequired(true)
+            .setMaxLength(200)
+        ),
     /**
      * @param {ChatInputCommandInteraction} interaction 
      */
@@ -15,14 +21,14 @@ module.exports = {
             .setTitle("")
             .setDescription(``)
             .setFields(
-                {name: ``, value:``, inline: false},
-                {name: ``, value:``, inline: false},
-                {name: ``, value:``, inline: false},
-                {name: ``, value:``, inline: false},
-                {name: ``, value:``, inline: false}
+                { name: ``, value: ``, inline: false },
+                { name: ``, value: ``, inline: false },
+                { name: ``, value: ``, inline: false },
+                { name: ``, value: ``, inline: false },
+                { name: ``, value: ``, inline: false }
             )
-            .setFooter({ 
-                text: ``, 
+            .setFooter({
+                text: ``,
                 iconURL: interaction.user.avatarURL()
             })
             .setTimestamp();
