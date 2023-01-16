@@ -32,7 +32,7 @@ module.exports = {
             console.log("success");
             console.log("<\\==========================/>");
         };
-        readyTasks();
+        await readyTasks();
         // STATUS
         const statusOptions = [
             `with ${client.guilds.cache.size} servers`,
