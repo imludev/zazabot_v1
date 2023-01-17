@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Client } = require("discord.js");;
-const jsonconfig = require("./config.json");
-const variables = require("./variables.js")
+const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder, Client } = require("discord.js");;
+const jsonconfig = require("../../config.json");
+const variables = require("../../variables.js")
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("name")
         .setDescription("")
+        // .setDefaultMemberPermissions(PermissionFlagsBits.)
         .addStringOption(options => options
             .setName("text")
             .setDescription("Enter some text")

@@ -1,9 +1,11 @@
-const { ChatInputCommandInteraction, InteractionType, EmbedBuilder } = require("discord.js");
+const { ChatInputCommandInteraction, InteractionType, EmbedBuilder, GuildMember, GuildMemberManager } = require("discord.js");
 const jsonconfig = require("../../config.json");
 module.exports = {
     name: "guildMemberAdd",
     /**
-     * @param {ChatInputCommandInteraction} interaction 
+     * 
+     * @param {GuildMember} member 
+     * @param {Client} client 
      */
     execute(member, client) {
         let welcomeEmbed2 = new EmbedBuilder({
@@ -19,7 +21,7 @@ module.exports = {
             .setThumbnail(member.avatarURL())
             .setFooter({ text: ` ${member.user.username} joined at `, iconURL: member.avatarURL() })
             .setTimestamp();
-
+        member.roles.add(jsonconfig.server.roles.member, "Joined the server")
         const welcomeCh = client.channels.cache.get(jsonconfig.server.channels.welcomeChannel);
         welcomeCh.send({ embeds: [welcomeEmbed] }).catch(console.error)
 

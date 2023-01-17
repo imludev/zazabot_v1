@@ -37,7 +37,7 @@ module.exports = {
         } else if (interaction.member.roles.cache.has(supportID)) {
             if (!target) return interaction.reply("Member has most likely left the guild.").catch(error => {
                 console.log(error)
-            });;
+            });
 
 
             if (interaction.member.roles.highest.position < target.roles.highest.position) {
@@ -57,24 +57,33 @@ module.exports = {
                 `${target} was banned.\nReason: ${reason}\nDate: ${getTimestamp()} `
             ].join("\n\n"));
 
-        await interaction.channel.send({
-            embeds: [successEmbed],
-        }).catch(error => {
-            console.log(error)
-        });
-
+        const dmEmbed = new EmbedBuilder()
+            .setAuthor({ name: `Ban | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+            .setFields(
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },
+            )
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
         const logEmbed = new EmbedBuilder()
             .setAuthor({ name: `New ban | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
             .setColor("DarkBlue")
             .setFields(
                 {
                     name: `Banned user`,
-                    value: `${target.user.username + "#" + target.user.discriminator + ", " + target.id.toString()}`,
+                    value: `${target.user.username + "#" + target.user.discriminator + ", \n" + target.id.toString()}`,
                     inline: true
                 },
                 {
                     name: `Banned by`,
-                    value: `${interaction.user.username + ", " + interaction.user.id}`,
+                    value: `${interaction.user.username + ", \n" + interaction.user.id}`,
                     inline: true
                 },
 
@@ -94,19 +103,32 @@ module.exports = {
             })
             .setTimestamp();
 
-        await logCh.send({
-            embeds: [logEmbed],
+
+        await interaction.channel.send({
+            embeds: [successEmbed],
         }).catch(error => {
             console.log(error)
+        }).then(async () => {
+            await logCh.send({
+                embeds: [logEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
+        }).then(async () => {
+            await target.send({
+                embeds: [dmEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
         });
         await guild.members.ban(target.id).catch((err) => {
             console.log(err);
             interaction.reply(
-                "Could not Ban user due to an uncommon error."
+                "Could not ban user due to an uncommon error."
             )
         }).then(() => {
-            interaction.reply({ content: `${jsonconfig.messages.success.moderation.successBan}`, ephemeral: false })
-        })
+            interaction.reply({ content: `${jsonconfig.messages.success.moderation.successBan}`, ephemeral: true })
+        });
     }
 }
 

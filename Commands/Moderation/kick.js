@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } = require("discord.js");;
-const kickDatabase = require("../../Schemas/Moderation/Kicks");
+const jsonconfig = require("../../config.json");
+const { botOwnerid, servOwnerId, supportRoleID } = require("../../variables")
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("kick")
@@ -23,78 +24,111 @@ module.exports = {
      */
     async execute(interaction, client) {
         const { options, guild, member } = interaction;
-
         const target = options.getMember("target");
-        const duration = options.getString("duration")
-        const reason = options.getString("reason") || "No reason specified."
-
-        const errorsArray = [];
-
-        const errorsEmbed = new EmbedBuilder()
-            .setAuthor({ name: "Could not kick a member due to", })
-            .setColor("Red");
-
-        if (!target) return interaction.reply({
-            embeds: [errorsEmbed.setDescription("Member has most likely left the guild.")]
-        }).catch(error => {
-            console.log(error)
-        });
+        const reason = options.getString("reason") || "No reason specified.";
+        const supportID = jsonconfig.server.roles.support;
+        const serverOwnerRoleID = jsonconfig.server.roles.owner;
+        const logCh = client.channels.cache.get(jsonconfig.server.channels.modLogChannel)
 
 
-        if (!target.kickable || !target.manageable || !target.moderatable)
-            errorsArray.push("Slected member cannot be moderated by this bot.")
-
-        if (member.roles.highest.position < target.roles.highest.position)
-            errorsArray.push("Selected member has a higher role than you do.")
-
-        if (errorsArray.length)
-            return interaction.reply({
-                embeds: [errorsEmbed.setDescription(errorsArray.join("\n"))],
-                ephemeral: true
-            }).catch(error => {
+        if (!interaction.member.roles.cache.has(supportID)) {
+            interaction.reply(jsonconfig.messages.errors.moderation.noPerms)
+        } else if (interaction.member.roles.cache.has(supportID)) {
+            if (!target) return interaction.reply("Member has most likely left the guild.").catch(error => {
                 console.log(error)
-            });
-        target.kick(reason).catch((err) => {
-            interaction.reply({
-                embeds: [errorsEmbed.setDescription("Could not kick user due to an uncommon error.")]
-            })
-        });
+            });;
 
-        const newInfractionsObject = {
-            IssuerID: member.id,
-            IsssuerTag: member.user.tag,
-            Reason: reason || "No reason specified",
-            Date: Date.now()
+
+            if (interaction.member.roles.highest.position < target.roles.highest.position) {
+                interaction.reply(jsonconfig.messages.errors.moderation.notModerateable + "a")
+                return;
+            }
+
+
         }
-
-        let userData = await kickDatabase.findOne({
-            Guild: guild.id,
-            User: target.id
-        });
-        if (!userData)
-            userData = await kickDatabase.create({
-                Guild: guild.id,
-                User: target.id
-            }).catch(error => {
-                console.log(error)
-            });
-        else {
-            userData.Kicks.push(newInfractionsObject) && await userData.save().catch(error => {
-                console.log(error)
-            });
-        }
+        function getTimestamp() {
+            return Date.now()
+        };
         const successEmbed = new EmbedBuilder()
-            .setAuthor({ name: "Kick issues", iconURL: guild.iconURL() })
-            .setColor('Green')
+            .setAuthor({ name: "Kick", iconURL: guild.iconURL() })
+            .setColor("DarkBlue")
             .setDescription([
-                `${target} was kicked, \nbringing their kick total to ** ${userData.Kicks.length + 1}**.\nReason: ${reason} `
+                `${target} was kicked.\nReason: ${reason}\nDate: ${getTimestamp()} `
             ].join("\n\n"));
 
-        return interaction.reply({
+        const dmEmbed = new EmbedBuilder()
+            .setAuthor({ name: `Kick | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+            .setFields(
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },
+            )
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
+
+
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: `New kick | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+            .setFields(
+                {
+                    name: `Kicked user`,
+                    value: `${target.user.username + "#" + target.user.discriminator + ", \n" + target.id.toString()}`,
+                    inline: true
+                },
+                {
+                    name: `Kicked by`,
+                    value: `${interaction.user.username + ", \n" + interaction.user.id}`,
+                    inline: true
+                },
+
+                {
+                    name: `Kicked at`,
+                    value: `${getTimestamp()}`,
+                    inline: false
+                },
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },)
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
+
+        await interaction.channel.send({
             embeds: [successEmbed],
         }).catch(error => {
             console.log(error)
+        }).then(async () => {
+            await logCh.send({
+                embeds: [logEmbed],
+            })
+        }).catch(error => {
+            console.log(error)
+        }).then(async () => {
+            await target.send({
+                embeds: [dmEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
         });
-
+        await guild.members.kick(target.id, reason).catch((err) => {
+            console.log(err);
+            interaction.reply(
+                "Could not kick user due to an uncommon error."
+            )
+        }).then(() => {
+            interaction.reply({ content: `${jsonconfig.messages.success.moderation.successKick}`, ephemeral: true })
+        })
     }
 }
+

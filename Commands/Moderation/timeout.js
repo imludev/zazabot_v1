@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } = require("discord.js");;
 const timeoutDatabase = require("../../Schemas/Moderation/Timeout");
 const ms = require("ms");
+const jsonconfig = require("../../config.json");
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("timeout")
@@ -30,85 +32,120 @@ module.exports = {
         const { options, guild, member } = interaction;
 
         const target = options.getMember("target");
-        const duration = options.getString("duration")
-        const reason = options.getString("reason") || "No reason specified."
+        const duration = options.getString("duration");
+        const reason = options.getString("reason") || "No reason specified.";
+        const logCh = client.channels.cache.get(jsonconfig.server.channels.modLogChannel)
+        function getTimestamp() {
+            return Date.now()
+        };
 
-        const errorsArray = [];
-
-        const errorsEmbed = new EmbedBuilder()
-            .setAuthor({ name: "Could not timeout a member due to", })
-            .setColor("Red");
-
-        if (!target) return interaction.reply({
-            embeds: [errorsEmbed.setDescription("Member has most likely left the guild.")]
-        }).catch(error => {
-            console.log(error)
-        });
+        if (!target) return interaction.reply("Member has most likely left the guild.")
+            .catch(error => {
+                console.log(error)
+            });
 
         if (!ms(duration) || ms(duration) > ms("28d"))
-            errorsArray.push("Time provided is invalid or over 28 days limit").catch(error => {
-                console.log(error)
-            });
+            interaction.reply("Time provided is invalid or over 28 days limit")
 
-        if (!target.manageable || !target.moderatable)
-            errorsArray.push("Slected member cannot be moderated by this bot.").catch(error => {
-                console.log(error)
-            });
 
         if (member.roles.highest.position < target.roles.highest.position)
-            errorsArray.push("Selected member has a higher role than you do.").catch(error => {
-                console.log(error)
-            });
+            interaction.reply("Selected member has a higher role than you do.")
 
-        if (errorsArray.length)
-            return interaction.reply({
-                embeds: [errorsEmbed.setDescription(errorsArray.join("\n"))],
-                ephemeral: true
-            }).catch(error => {
-                console.log(error)
-            });
-        target.timeout(ms(duration), reason).catch((err) => {
-            interaction.reply({
-                embeds: [errorsEmbed.setDescription("Could not time out user due to an uncommon error.")]
-            }).catch(error => {
-                console.log(error)
-            });
-        });
 
-        const newInfractionsObject = {
-            IssuerID: member.id,
-            IsssuerTag: member.user.tag,
-            Reason: reason || "No reason speified",
-            Date: Date.now()
-        }
-
-        let userData = await timeoutDatabase.findOne({
-            Guild: guild.id,
-            User: target.id
-        });
-        if (!userData)
-            userData = await timeoutDatabase.create({
-                Guild: guild.id,
-                User: target.id
-            })
-        else {
-            userData.Timeouts.push(newInfractionsObject) && await userData.save().catch(error => {
-                console.log(error)
-            });
-        }
         const successEmbed = new EmbedBuilder()
-            .setAuthor({ name: "Timeout issues", iconURL: guild.iconURL() })
-            .setColor('Green')
-            .setDescription([
-                `${target} was issued a timeout for **${duration}**, \nbringing their infractions total to ** ${userData.Timeouts.length}**.\nReason: ${reason} `
-            ].join("\n\n"));
+            .setAuthor({ name: "Timeout", iconURL: guild.iconURL() })
+            .setColor("DarkBlue")
+            .setDescription(
+                `${target} was timed out.\nReason: ${reason}\nDuration: ${duration} `
+            );
 
-        return interaction.reply({
-            embeds: [successEmbed],
-        }).catch(error => {
-            console.log(error)
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: `New timeout | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+            .setFields(
+                {
+                    name: `Target user`,
+                    value: `${target.user.username + "#" + target.user.discriminator + ", \n" + target.id.toString()}`,
+                    inline: true
+                },
+                {
+                    name: `Timed out by`,
+                    value: `${interaction.user.username + ", \n" + interaction.user.id}`,
+                    inline: true
+                },
+                {
+                    name: `Duration`,
+                    value: `${duration}`,
+                    inline: true
+                },
+                {
+                    name: `Timed out at`,
+                    value: `${getTimestamp()}`,
+                    inline: false
+                },
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },
+            )
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
+        const dmEmbed = new EmbedBuilder()
+            .setAuthor({ name: `Timeout | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+
+            .setFields(
+
+                {
+                    name: `Duration`,
+                    value: `${duration}`,
+                    inline: true
+                },
+
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },
+            )
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
+
+        target.timeout(ms(duration), reason).catch((err) => {
+            interaction.reply("Could not time out user due to an uncommon error.").catch(error => {
+                console.log(error)
+            });
+        }).then(() => {
+            interaction.reply({ content: `${jsonconfig.messages.success.moderation.successTimeout}`, ephemeral: true })
+        }).then(async () => {
+            await interaction.channel.send({
+                embeds: [successEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
+        }).then(async () => {
+            await logCh.send({
+                embeds: [logEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
+        }).then(async () => {
+            await target.send({
+                embeds: [dmEmbed],
+            }).catch(error => {
+                console.log(error)
+            });
         });
+
 
     }
+
 }
 // 31:15
