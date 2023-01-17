@@ -35,7 +35,7 @@
             "ytUploadChannel": "1064204376228511926",
             "welcomeChannel": "1064204376228511928",
             "leaveChannel": "1064204376228511928",
-            "rulesChannel": "1064216664171888690"
+            "rulesChannel": "1064204376228511925"
         }
     },
     "socials": {
@@ -53,7 +53,8 @@
                 "noPerms": "You have insufficient permissions to execute this command.",
                 "kickErr": "There was an error while kicking the person.",
                 "banErr": "There was an error while banning the person.",
-                "muteErr": "There was an error while timing out the person."
+                "muteErr": "There was an error while timing out the person.",
+                "notModerateable": "This member is not moderatable."
             },
             "tickets": {
                 "noTicketChan": "This is not a (valid) ticket channel.",
@@ -87,6 +88,11 @@
             "ticket": {},
             "config": {
                 "addedConf": "The configuration was added successfully."
+            },
+            "moderation": {
+                "successBan": "User has successfully been banned.",
+                "successKick": "User has successfully been kicked.",
+                "successTimeout": "User has successfully recieved a timeout."
             }
         }
     }

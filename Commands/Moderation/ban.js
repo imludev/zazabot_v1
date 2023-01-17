@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } = require("discord.js");;
 const BanDatabase = require("../../Schemas/Moderation/Bans");
-const config = require("../../config.json");
+const jsonconfig = require("../../config.json");
 const { botOwnerid, servOwnerId, supportRoleID } = require("../../variables")
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,81 +25,88 @@ module.exports = {
      */
     async execute(interaction, client) {
         const { options, guild, member } = interaction;
-
         const target = options.getMember("target");
-        const duration = options.getString("duration")
-        const reason = options.getString("reason") || "No reason specified."
-        // const supportRoleID = config.server.roles.support.toString();
+        const reason = options.getString("reason") || "No reason specified.";
+        const supportID = jsonconfig.server.roles.support;
+        const serverOwnerRoleID = jsonconfig.server.roles.owner;
+        const logCh = client.channels.cache.get(jsonconfig.server.channels.modLogChannel)
 
-        const errorsArray = [];
 
-        const errorsEmbed = new EmbedBuilder()
-            .setAuthor({ name: "Could not Ban a member due to", })
-            .setColor("Red");
-        if (interaction.user.id != supportRoleID || interaction.user.id != servOwnerId) {
-            interaction.reply("You cannot preform this action.")
-        } else if (interaction.user.id == supportRoleID || interaction.user.id == servOwnerId) {
-            if (!target) return interaction.reply({
-                embeds: [errorsEmbed.setDescription("Member has most likely left the guild.")]
-            }).catch(error => {
+        if (!interaction.member.roles.cache.has(supportID)) {
+            interaction.reply(jsonconfig.messages.errors.moderation.noPerms)
+        } else if (interaction.member.roles.cache.has(supportID)) {
+            if (!target) return interaction.reply("Member has most likely left the guild.").catch(error => {
                 console.log(error)
             });;
 
 
-            if (!target.Banable || !target.manageable || !target.moderatable)
-                errorsArray.push("Slected member cannot be moderated by this bot.")
-
-            if (member.roles.highest.position < target.roles.highest.position)
-                errorsArray.push("Selected member has a higher role than you do.")
-
-            if (errorsArray.length) {
-                return interaction.reply({
-                    embeds: [errorsEmbed.setDescription(errorsArray.join("\n"))],
-                    ephemeral: true
-                }).catch(error => {
-                    console.log(error)
-                });
-            }
-            const newInfractionsObject = {
-                IssuerID: member.id,
-                IsssuerTag: member.user.tag,
-                Reason: reason,
-                Date: Date.now()
+            if (interaction.member.roles.highest.position < target.roles.highest.position) {
+                interaction.reply(jsonconfig.messages.errors.moderation.notModerateable + "a")
+                return;
             }
 
-            let userData = await BanDatabase.findOne({
-                Guild: guild.id,
-                User: target.id
-            });
-            if (!userData)
-                userData = await BanDatabase.create({
-                    Guild: guild.id,
-                    User: target.id
-                })
-            else {
-                userData.Bans.push(newInfractionsObject) && await userData.save().catch(error => {
-                    console.log(error)
-                });
-            }
-            const successEmbed = new EmbedBuilder()
-                .setAuthor({ name: "Ban issues", iconURL: guild.iconURL() })
-                .setColor('Green')
-                .setDescription([
-                    `${target} was issued a Ban, \nbringing their infractions total to ** ${userData.Bans.length}**.\nReason: ${reason} `
-                ].join("\n\n"));
 
-            interaction.reply({
-                embeds: [successEmbed],
-            }).catch(error => {
-                console.log(error)
-            });
-
-            target.Ban(reason).catch((err) => {
-                console.log(err);
-                interaction.reply({
-                    embeds: [errorsEmbed.setDescription("Could not Ban user due to an uncommon error.")]
-                })
-            });
         }
+        function getTimestamp() {
+            return Date.now()
+        };
+        const successEmbed = new EmbedBuilder()
+            .setAuthor({ name: "Ban", iconURL: guild.iconURL() })
+            .setColor("DarkBlue")
+            .setDescription([
+                `${target} was banned.\nReason: ${reason}\nDate: ${getTimestamp()} `
+            ].join("\n\n"));
+
+        await interaction.channel.send({
+            embeds: [successEmbed],
+        }).catch(error => {
+            console.log(error)
+        });
+
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: `New ban | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL })
+            .setColor("DarkBlue")
+            .setFields(
+                {
+                    name: `Banned user`,
+                    value: `${target.user.username + "#" + target.user.discriminator + ", " + target.id.toString()}`,
+                    inline: true
+                },
+                {
+                    name: `Banned by`,
+                    value: `${interaction.user.username + ", " + interaction.user.id}`,
+                    inline: true
+                },
+
+                {
+                    name: `Banned at`,
+                    value: `${getTimestamp()}`,
+                    inline: false
+                },
+                {
+                    name: `Reason`,
+                    value: `${reason}`,
+                    inline: false
+                },)
+            .setFooter({
+                text: jsonconfig.server.name,
+                iconURL: jsonconfig.server.iconURL
+            })
+            .setTimestamp();
+
+        await logCh.send({
+            embeds: [logEmbed],
+        }).catch(error => {
+            console.log(error)
+        });
+        await guild.members.ban(target.id).catch((err) => {
+            console.log(err);
+            interaction.reply(
+                "Could not Ban user due to an uncommon error."
+            )
+        }).then(() => {
+            interaction.reply({ content: `${jsonconfig.messages.success.moderation.successBan}`, ephemeral: false })
+        })
     }
 }
+
