@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction } = require("discord.js");;
+const { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } = require("discord.js");;
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("say")
-        .setDescription("Check the bots latency")
+        .setDescription("Let the bot say something")
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
         .addStringOption(options => options
             .setName("text")
             .setDescription("Enter some text")

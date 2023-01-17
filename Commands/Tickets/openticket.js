@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionsBitField, ChannelType } = require("discord.js");
+const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionsBitField, ChannelType, EmbedBuilder } = require("discord.js");
 const mongoose = require("mongoose")
 const jsonconfig = require("../../config.json");
 
@@ -21,6 +21,21 @@ module.exports = {
         function getTimestamp() {
             return Date.now()
         };
+        var ticketEmbed = new EmbedBuilder()
+            .setAuthor({ name: `${interaction.user.username} | ${jsonconfig.server.name}`, iconURL: interaction.user.avatarURL() })
+            .setColor("DarkBlue")
+            .setTitle("New ticket")
+            .setDescription(`A new ticket has been opened. See the details below.`)
+            .setFields(
+                { name: `Creator`, value: `${interaction.user.username}#${interaction.user.discriminator}, ${interaction.user.id}`, inline: true },
+                { name: `Reason`, value: `${reason}`, inline: true },
+                { name: `Created at`, value: `${getTimestamp()}`, inline: false },
+            )
+            .setFooter({
+                text: interaction.member.displayName,
+                iconURL: interaction.user.avatarURL()
+            })
+            .setTimestamp();
 
         interaction.guild.channels.create({
             name: `ticket-${TicketNR}`,
@@ -47,7 +62,10 @@ module.exports = {
                 }
             ],
         }).then((channel) => {
-            interaction.reply(`I've created a ticket for your. ${channel}`)
+            interaction.reply(`I've created a ticket for your. ${channel}`),
+                channel.send({
+                    embeds: [ticketEmbed]
+                })
 
         })
 

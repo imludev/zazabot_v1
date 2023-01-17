@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } = require("discord.js");
 
 const jsonconfig = require("../../config.json");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("close")
-        .setDescription("Check the bots latency")
+        .setDescription("Close the ticket")
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addStringOption((options) => options
             .setName("message")
             .setDescription("Enter a small message/recap/debrief")

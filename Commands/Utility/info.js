@@ -20,7 +20,8 @@ module.exports = {
             .setName("server")
             .setDescription("Get serverinfo")
 
-        ),
+        )
+    ,
     /**
      * 
      * @param {ChatInputCommandInteraction} interaction 
@@ -52,7 +53,7 @@ module.exports = {
                     new ButtonBuilder()
                         .setLabel("Snapchat")
                         .setURL(`https://snapchat.com/add/${jsonconfig.socials.snap}`)
-                        .setDisabled(true)
+                        .setDisabled(false)
                         .setEmoji("👻")
                         .setStyle(ButtonStyle.Link),
 
@@ -73,7 +74,7 @@ Als je mijn livestreams en video's leuk vind,
 zou ik het fijn vinden als je een like dropt en abonneert.
 Kijk ook zeer op mijn socials`, inline: false
                         },
-                        { name: `Socials`, value: `\s`, inline: false }
+                        { name: `Socials`, value: `\t`, inline: false }
                     )
                     .setFooter({
                         text: jsonconfig.server.name,
@@ -117,16 +118,7 @@ Kijk ook zeer op mijn socials`, inline: false
                             value: `[${jsonconfig.botowner.name}](https://discord.com/users/${jsonconfig.botowner.id})`,
                             inline: false
                         },
-                        // {
-                        //     name: ``,
-                        //     value: ``,
-                        //     inline: false
-                        // },
-                        // {
-                        //     name: ``,
-                        //     value: ``,
-                        //     inline: false
-                        // },
+
 
 
                     )
@@ -137,6 +129,66 @@ Kijk ook zeer op mijn socials`, inline: false
                 });
                 break;
             case "server":
+                const serverName = interaction.guild.name;
+                const serverID = interaction.guild.id;
+                const memberCount = interaction.guild.memberCount;
+                const allMembers = interaction.guild.members.cache;
+                const allEmojis = interaction.guild.emojis;
+                const allStickers = interaction.guild.stickers;
+
+                const servername = interaction.guild.name;
+                const allRoles = interaction.guild.roles.cache;
+                const serverOwnerID = interaction.guild.ownerId;
+                const boostTier = interaction.guild.premiumTier;
+                const boostCount = interaction.guild.premiumSubscriptionCount;
+
+                const allChannels = interaction.guild.channels.cache;
+                const allChannelsNoTH = interaction.guild.channels.channelCountWithoutThreads;
+
+
+
+
+                let serverinfoEmbed = new EmbedBuilder()
+                    .setAuthor({
+                        name: `${jsonconfig.server.name} | ${jsonconfig.server.name}`, iconURL: jsonconfig.server.iconURL
+                    }).setColor("#72008E")
+                    .setTitle("Bot info")
+                    .addFields({
+                        name: `Total Members`,
+                        value: `${memberCount}`,
+                        inline: true,
+                    }, {
+                        name: `Emojis`,
+                        value: `${allEmojis.cache.size.toString()} emojis, ${allStickers.cache.size.toString()} stickers`,
+                        inline: true,
+                    }, {
+                        name: `Roles`,
+                        value: `${allRoles.size.toString()}`,
+                        inline: true,
+                    }, {
+                        name: `Server owner`,
+                        value: `<@${serverOwnerID}>, ${serverOwnerID}`,
+                        inline: true,
+                    }, {
+                        name: `Boost tier`,
+                        value: `${boostTier}`,
+                        inline: true,
+                    }, {
+                        name: `Boosters`,
+                        value: `${boostCount}`,
+                        inline: true,
+                    }, {
+                        name: `Channel count`,
+                        value: `${allChannels.size.toString()} channels`,
+                        inline: true,
+                    })
+
+                    .setFooter({ text: `Server Name: ${serverName.toString()} | Server ID: ${serverID}` });
+
+                interaction.reply({
+                    embeds: [botinfoEmbed]
+                    // , ephemeral: true
+                });
                 break;
         }
 

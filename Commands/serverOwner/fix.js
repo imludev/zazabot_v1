@@ -5,7 +5,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("fix")
         .setDescription("Fix the server & bot's name")
-        // .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption((options) => options
             .setName("id")
             .setDescription("Enter bot owner's ID to continue")
