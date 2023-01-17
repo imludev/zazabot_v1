@@ -51,7 +51,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Link),
                     new ButtonBuilder()
                         .setLabel("Snapchat")
-                        .setURL(`https://snapchat.com/${jsonconfig.socials.snap}`)
+                        .setURL(`https://snapchat.com/add/${jsonconfig.socials.snap}`)
                         .setDisabled(true)
                         .setEmoji("👻")
                         .setStyle(ButtonStyle.Link),
