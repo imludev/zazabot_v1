@@ -7,9 +7,21 @@ module.exports = {
     /**
      * @param {ChatInputCommandInteraction} interaction 
      */
-    execute(interaction, client) {
+    async execute(interaction, client) {
+
+        var ping;
+        var ping2;
+        let pingC = interaction.createdTimestamp - Date.now();
+        if (pingC <= 0) {
+            pingC = "347";
+        };
+        let pingC2 = Math.round(client.ws.ping);
+        if (pingC2 <= 0) {
+            pingC2 = "347";
+        };
+
         interaction.reply({
-            content: `Pong pang! Bot latency is **${interaction.createdTimestamp - Date.now()}ms**. API latency is **${Math.round(client.ws.ping)}ms**.`
-        });
+            content: `Pong pang! Bot latency is **${pingC} ms**. API latency is **${pingC2} ms.**`
+        }).catch(console.error)
     }
 }
