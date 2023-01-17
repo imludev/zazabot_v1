@@ -9,8 +9,6 @@ module.exports = {
      */
     async execute(interaction, client) {
 
-        var ping;
-        var ping2;
         let pingC = interaction.createdTimestamp - Date.now();
         if (pingC <= 0) {
             pingC = "347";
